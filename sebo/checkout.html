@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Checkout · Guapísima</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+@font-face{font-family:"Laminor";src:url("fonts/Laminor-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+:root{--ink:#272933;--cream:#F2F0EB;--muted:#B1B4C4;--pink:#FFA6C5;--pad:clamp(20px,6vw,36px)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ink);color:var(--cream);font:400 16px/1.3 "Laminor",sans-serif;font-variant-numeric:oldstyle-nums;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:underline;text-underline-offset:.15em}
+button,input,select{font:inherit;color:inherit}
+.wrap{max-width:calc(740px + 2*var(--pad));margin:0 auto;padding:72.5px var(--pad) 72px}
+.num{font-variant-numeric:lining-nums}
+
+h1{margin:0;font:400 48px/1.1 "Laminor",sans-serif}
+.back{display:inline-flex;align-items:center;gap:12px;margin-top:30.5px;color:var(--muted);text-decoration:none;font-size:16px}
+.back svg{width:16px;height:16px;flex:none}
+.back:hover{color:var(--cream)}
+h2{margin:0;font:400 24px/1.2 "Laminor",sans-serif}
+
+/* order summary */
+.order{margin-top:42px;border-top:1px solid var(--cream)}
+.order h2{padding:15px 0 32.5px;border-bottom:1px solid var(--muted)}
+.row{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;color:var(--muted);border-bottom:1px solid var(--muted)}
+.row .name{font-size:24px;line-height:1.2}
+.row .amt{font-size:24px;line-height:1.2;font-variant-numeric:lining-nums;white-space:nowrap}
+.row.main{padding:28.5px 0 25px}
+.row.main>div:first-child{flex:1;min-width:0}
+.row.main .desc{margin-top:6px;font-size:16px;line-height:1.3;max-width:560px}
+.row.main .desc span{display:block}
+.row.extra{padding:29px 0 23.5px;align-items:center}
+.sums{padding:14px 0 0;text-align:right;color:var(--muted);font-size:16px;line-height:1.5;font-variant-numeric:lining-nums}
+.total-top{display:flex;justify-content:space-between;align-items:center;margin-top:18.5px;padding-bottom:51px;color:var(--muted);font:400 33px/1 "Laminor",sans-serif;font-variant-numeric:lining-nums}
+
+/* two columns */
+.cols{display:grid;grid-template-columns:1fr 1fr;column-gap:48px;align-items:start}
+.col{border-top:1px solid var(--muted);padding-top:10.5px;min-width:0}
+.col>h2,.hd{margin:0}
+.hd{display:flex;justify-content:space-between;align-items:baseline}
+.hd small{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted)}
+.hd small svg{width:18px;height:18px}
+.sub{margin-top:26px}
+.field{margin-top:20px;min-width:0}
+.col>h2+.field{margin-top:20.5px}
+#card-fields>.field:first-child{margin-top:29px}
+.pair{display:grid;grid-template-columns:1fr 1fr;column-gap:16px}
+label.l{display:block;margin-bottom:6px;font-size:16px;line-height:1.3;color:var(--cream)}
+.in{position:relative}
+.in input,.in select{display:block;width:100%;height:52px;margin:0;padding:0 18px;background:transparent;border:1px solid var(--muted);border-radius:8px;color:var(--cream);font-size:16px;font-variant-numeric:oldstyle-nums;appearance:none;-webkit-appearance:none;outline:none;transition:border-color .15s}
+.in input::placeholder{color:var(--muted);opacity:1}
+.in select{padding-right:46px;cursor:pointer}
+.in select:invalid,.in select.empty{color:var(--muted)}
+.in select option{color:#13141A;background:#fff}
+.in input:focus,.in select:focus{border-color:var(--cream);box-shadow:0 0 0 2px var(--ink),0 0 0 4px var(--pink)}
+.in .ico{position:absolute;right:16px;top:50%;width:18px;height:18px;margin-top:-9px;color:var(--muted);pointer-events:none}
+.in .ico.tip{pointer-events:auto;cursor:help}
+.field.bad .in input,.field.bad .in select{border-color:var(--pink)}
+.msg{display:none;margin-top:6px;font-size:14px;color:var(--pink)}
+.field.bad .msg{display:block}
+.hint{margin:17px 0 0;font-size:14px;line-height:1.3;color:var(--muted)}
+.pay-total{display:flex;justify-content:space-between;align-items:center;margin-top:24px;padding-top:11px;border-top:2px solid var(--muted);font:400 33px/1 "Laminor",sans-serif;font-variant-numeric:lining-nums;height:72px}
+.agree{display:flex;align-items:flex-start;gap:14px;margin-top:10.4px;color:var(--muted);cursor:pointer;font-size:16px;line-height:1.5}
+.agree input{appearance:none;-webkit-appearance:none;flex:none;width:24px;height:24px;margin:0;border:2px solid var(--muted);border-radius:0;background:none;display:grid;place-content:center;cursor:pointer}
+.agree input::after{content:"";width:10px;height:10px;background:var(--cream);transform:scale(0);transition:transform .15s}
+.agree input:checked::after{transform:scale(1)}
+.agree input:focus-visible{outline:2px solid var(--pink);outline-offset:3px}
+.agree.bad input{border-color:var(--pink)}
+.agree span{padding-top:0}
+.agree a{color:var(--cream)}
+.err{min-height:1.3em;margin:10px 0 0;color:var(--pink);font-size:15px}
+.go{display:block;width:100%;height:68px;margin:4.5px 0 0;border:0;background:var(--pink);color:var(--ink);cursor:pointer;font:400 22px/1 "Laminor",sans-serif;text-transform:uppercase;font-variant-numeric:lining-nums;letter-spacing:.08em;-webkit-appearance:none;appearance:none;border-radius:0}
+.go:hover{background:#FFB8D0}
+.go:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+.go[disabled]{opacity:.6;cursor:default}
+.notice{margin:14px 0 0;padding:12px 14px;border:1px solid var(--muted);font-size:14px;line-height:1.4;color:var(--muted)}
+.notice[hidden]{display:none}
+.secure{display:flex;justify-content:center;align-items:center;gap:8px;margin:16px 0 0;font-size:14px;color:var(--muted)}
+.secure svg{width:16px;height:16px}
+.q{margin:18.5px 0 0;text-align:center;font-size:14px;color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* single column (tablet and phone) */
+@media (max-width:720px){
+  .wrap{padding-top:38.5px;padding-bottom:37px}
+  .back{margin-top:19px}
+  .order{margin-top:32.5px;border-top:0}
+  .order h2{padding:0 0 13px}
+  .row.main{padding:16px 0 12px}
+  .row.main .desc{margin-top:12px;max-width:420px}
+  .row.extra{padding:16px 0 12px}
+  .cols{display:block}
+  .col{margin-top:0}
+  .col+.col{margin-top:37px}
+  .total-top{padding-bottom:39px}
+  .pay-total{margin-top:24px}
+  .go{margin-top:6px}
+}
+@media (max-width:420px){
+  .row .name,.row .amt{font-size:22px}
+  .pair{column-gap:12px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Checkout</h1>
+  <a class="back" href="index.html#buy"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 8H2M7 3L2 8l5 5"/></svg>Back to license selection</a>
+
+  <section class="order" aria-labelledby="h-order">
+    <h2 id="h-order">Your order</h2>
+    <div class="row main">
+      <div>
+        <div class="name">Guapísima Pro Black</div>
+        <div class="desc"><span id="o-lic">Small license, up to 3 users, up to 50k visitors/month</span><span>Print, logo and website use for your own business, on one domain</span></div>
+      </div>
+      <div class="amt" id="o-price">90€</div>
+    </div>
+    <div class="row extra"><div class="name">Guapísima Pro Black Strong</div><div class="amt">included</div></div>
+    <div class="sums"><div>Subtotal: <span id="o-sub">90€</span></div><div id="o-vat">VAT 21%: 18,9€</div></div>
+    <div class="total-top"><span>Total</span><span id="o-total">108,9€</span></div>
+  </section>
+
+  <form id="co" class="cols" novalidate autocomplete="on">
+    <div class="col">
+      <h2>Your details</h2>
+      <div class="field" data-f="email">
+        <label class="l" for="email">Email address</label>
+        <div class="in"><input id="email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com" required></div>
+        <div class="msg">Enter a valid email address.</div>
+      </div>
+      <p class="hint">Your fonts and receipt will be sent to this address.</p>
+
+      <h2 class="sub" style="margin-top:24.5px;margin-bottom:1px">Billing details</h2>
+      <div class="pair">
+        <div class="field" data-f="first">
+          <label class="l" for="first">First name</label>
+          <div class="in"><input id="first" name="first" autocomplete="given-name" placeholder="First name" required></div>
+          <div class="msg">Required.</div>
+        </div>
+        <div class="field" data-f="last">
+          <label class="l" for="last">Last name</label>
+          <div class="in"><input id="last" name="last" autocomplete="family-name" placeholder="Last name" required></div>
+          <div class="msg">Required.</div>
+        </div>
+      </div>
+      <div class="field" data-f="company">
+        <label class="l" for="company">Company (optional)</label>
+        <div class="in"><input id="company" name="company" autocomplete="organization" placeholder="Company name"></div>
+      </div>
+      <div class="field" data-f="street">
+        <label class="l" for="street">Street address</label>
+        <div class="in"><input id="street" name="street" autocomplete="address-line1" placeholder="Street and number" required></div>
+        <div class="msg">Required.</div>
+      </div>
+      <div class="pair">
+        <div class="field" data-f="city">
+          <label class="l" for="city">City</label>
+          <div class="in"><input id="city" name="city" autocomplete="address-level2" placeholder="City" required></div>
+          <div class="msg">Required.</div>
+        </div>
+        <div class="field" data-f="zip">
+          <label class="l" for="zip">Postal code</label>
+          <div class="in"><input id="zip" name="zip" autocomplete="postal-code" placeholder="Postal code" required></div>
+          <div class="msg">Required.</div>
+        </div>
+      </div>
+      <div class="field" data-f="country">
+        <label class="l" for="country">Country / region</label>
+        <div class="in">
+          <select id="country" name="country" autocomplete="country" required class="empty"></select>
+          <svg class="ico" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6l5 5 5-5"/></svg>
+        </div>
+        <div class="msg">Choose your country.</div>
+      </div>
+      <div class="field" data-f="vat">
+        <label class="l" for="vat">VAT number (optional)</label>
+        <div class="in"><input id="vat" name="vat" autocomplete="off" placeholder="VAT number" autocapitalize="characters" spellcheck="false"></div>
+        <div class="msg" id="vat-msg">Enter a valid EU VAT number, for example DE123456789.</div>
+      </div>
+    </div>
+
+    <div class="col">
+      <div class="hd"><h2>Payment</h2><small><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="1.5" y="3.5" width="15" height="11" rx="1.5"/><path d="M1.5 7h15"/></svg>Credit / debit card</small></div>
+
+      <!-- Card fields. Replace this block with the payment provider's hosted fields (e.g. Stripe Elements)
+           so card data never touches this page. The inputs below are only the visual design. -->
+      <div id="card-fields">
+        <div class="field" data-f="cname">
+          <label class="l" for="cname">Name on card</label>
+          <div class="in"><input id="cname" name="cname" autocomplete="cc-name" placeholder="Full name on card" required></div>
+          <div class="msg">Required.</div>
+        </div>
+        <div class="field" data-f="cnum">
+          <label class="l" for="cnum">Card number</label>
+          <div class="in"><input id="cnum" name="cnum" inputmode="numeric" autocomplete="cc-number" placeholder="1234 1234 1234 1234" maxlength="23" required>
+            <svg class="ico" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="1.5" y="3.5" width="15" height="11" rx="1.5"/><path d="M1.5 7h15"/></svg></div>
+          <div class="msg">Enter a valid card number.</div>
+        </div>
+        <div class="pair">
+          <div class="field" data-f="cexp">
+            <label class="l" for="cexp">Expiry date</label>
+            <div class="in"><input id="cexp" name="cexp" inputmode="numeric" autocomplete="cc-exp" placeholder="MM / YY" maxlength="7" required></div>
+            <div class="msg">Enter a valid date.</div>
+          </div>
+          <div class="field" data-f="ccvc">
+            <label class="l" for="ccvc">Security code</label>
+            <div class="in"><input id="ccvc" name="ccvc" inputmode="numeric" autocomplete="cc-csc" placeholder="CVC" maxlength="4" required>
+              <svg class="ico tip" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3" role="img" aria-label="3 digits on the back of your card, 4 on the front for American Express"><title>3 digits on the back of your card (4 on the front for American Express)</title><circle cx="9" cy="9" r="7.5"/><path d="M7 7.2a2 2 0 1 1 2.8 1.8c-.6.3-.8.7-.8 1.3M9 12.8v.1" stroke-linecap="round"/></svg></div>
+            <div class="msg">Enter the security code.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pay-total"><span>Total</span><span id="p-total">108,9€</span></div>
+      <label class="agree" id="agree-l"><input type="checkbox" id="agree"><span>I agree to the <a href="#" target="_blank" rel="noopener">End user license agreement</a> and <a href="#" target="_blank" rel="noopener">Privacy policy</a>.</span></label>
+      <p class="err" id="err" role="alert"></p>
+      <button class="go" type="submit" id="go">pay 108,9€</button>
+      <p class="notice" id="notice" hidden>Preview only: the payment provider is not connected yet, so nothing was charged and no data was sent. <a href="thanks.html">See the confirmation page</a>.</p>
+      <p class="secure"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.5 7V5a2.5 2.5 0 0 1 5 0v2"/></svg>Secure payment · Instant font download</p>
+      <p class="q">Questions? <a href="mailto:license@guapisima.eu">license@guapisima.eu</a></p>
+    </div>
+  </form>
+</div>
+
+<script>
+(function(){
+  /* ---------- configuration ---------- */
+  var SELLER_COUNTRY="RO";            // domestic sales always carry VAT, even with a VAT number
+  var LICENSES={
+    small :{price:90 ,label:"Small license, up to 3 users, up to 50k visitors/month"},
+    medium:{price:180,label:"Medium license, up to 10 users, up to 250k visitors/month"},
+    large :{price:360,label:"Large license, up to 30 users, up to 1M visitors/month"}
+  };
+  /* Standard VAT rates, for display only. The payment provider (Stripe Tax, Paddle, ...) must be the
+     source of truth for the amount actually charged, and for validating VAT numbers (VIES). */
+  var EU={AT:["Austria",20],BE:["Belgium",21],BG:["Bulgaria",20],HR:["Croatia",25],CY:["Cyprus",19],CZ:["Czechia",21],DK:["Denmark",25],EE:["Estonia",24],FI:["Finland",25.5],FR:["France",20],DE:["Germany",19],GR:["Greece",24],HU:["Hungary",27],IE:["Ireland",23],IT:["Italy",22],LV:["Latvia",21],LT:["Lithuania",21],LU:["Luxembourg",17],MT:["Malta",18],NL:["Netherlands",21],PL:["Poland",23],PT:["Portugal",23],RO:["Romania",21],SK:["Slovakia",23],SI:["Slovenia",22],ES:["Spain",21],SE:["Sweden",25]};
+  var OTHER=[["AL","Albania"],["AR","Argentina"],["AU","Australia"],["BA","Bosnia and Herzegovina"],["BR","Brazil"],["CA","Canada"],["CH","Switzerland"],["CN","China"],["GB","United Kingdom"],["HK","Hong Kong"],["IL","Israel"],["IN","India"],["IS","Iceland"],["JP","Japan"],["KR","South Korea"],["LI","Liechtenstein"],["MD","Moldova"],["ME","Montenegro"],["MK","North Macedonia"],["MX","Mexico"],["NO","Norway"],["NZ","New Zealand"],["RS","Serbia"],["SG","Singapore"],["TR","Türkiye"],["UA","Ukraine"],["US","United States"],["XX","Other country"]];
+  var DEFAULT_RATE=21;                // shown until a country is chosen
+
+  /* ---------- helpers ---------- */
+  var $=function(id){return document.getElementById(id)};
+  function money(n){var s=(Math.round(n*100)/100).toFixed(2).replace(/\.?0+$/,"");return s.replace(".",",")+"€"}
+  var params=new URLSearchParams(location.search),key=params.get("license");
+  try{if(!LICENSES[key])key=sessionStorage.getItem("guapisima.license")}catch(e){}
+  if(!LICENSES[key])key="small";
+  try{sessionStorage.setItem("guapisima.license",key)}catch(e){}
+  var lic=LICENSES[key];
+
+  /* country list */
+  var sel=$("country"),all=[];
+  Object.keys(EU).forEach(function(c){all.push([c,EU[c][0]])});
+  OTHER.forEach(function(o){all.push(o)});
+  all.sort(function(a,b){return a[0]==="XX"?1:b[0]==="XX"?-1:a[1].localeCompare(b[1])});
+  sel.innerHTML='<option value="" selected disabled>Select country</option>'+all.map(function(c){return '<option value="'+c[0]+'">'+c[1]+'</option>'}).join("");
+  sel.addEventListener("change",function(){sel.classList.remove("empty");sel.style.color="var(--cream)"});
+  sel.style.color="var(--muted)";
+
+  /* VAT number: format check only (country prefix + 2-12 letters/digits). */
+  function vatState(){
+    var v=$("vat").value.replace(/[\s.\-]/g,"").toUpperCase(),c=sel.value;
+    if(!v)return {empty:true};
+    var m=/^([A-Z]{2})([A-Z0-9]{2,12})$/.exec(v);
+    var ok=!!m&&!!EU[m[1]==="EL"?"GR":m[1]];
+    return {empty:false,ok:ok,cc:ok?(m[1]==="EL"?"GR":m[1]):null,value:v};
+  }
+  function calc(){
+    var c=sel.value,base=lic.price,rate,note="";
+    if(!c){rate=DEFAULT_RATE}
+    else if(EU[c]){rate=EU[c][1]}
+    else rate=0;
+    var vs=vatState();
+    var reverse=!!c&&!!EU[c]&&c!==SELLER_COUNTRY&&!vs.empty&&vs.ok&&vs.cc===c;
+    if(reverse){rate=0;note="VAT reverse charge: 0€"}
+    var vat=Math.round(base*rate)/100,total=base+vat;
+    return {base:base,rate:rate,vat:vat,total:total,reverse:reverse,country:c,outside:!!c&&!EU[c],note:note};
+  }
+  function render(){
+    var t=calc();
+    $("o-lic").textContent=lic.label;
+    $("o-price").textContent=money(t.base);
+    $("o-sub").textContent=money(t.base);
+    $("o-vat").textContent=t.reverse?"VAT reverse charge: 0€":(t.outside?"VAT: 0€":"VAT "+String(t.rate).replace(".",",")+"%: "+money(t.vat));
+    $("o-total").textContent=money(t.total);
+    $("p-total").textContent=money(t.total);
+    $("go").textContent="pay "+money(t.total);
+    return t;
+  }
+  ["change","input"].forEach(function(e){sel.addEventListener(e,render);$("vat").addEventListener(e,render)});
+  render();
+
+  /* ---------- input formatting ---------- */
+  $("cnum").addEventListener("input",function(){
+    var d=this.value.replace(/\D/g,"").slice(0,19);
+    this.value=d.replace(/(.{4})/g,"$1 ").trim();
+  });
+  $("cexp").addEventListener("input",function(e){
+    var d=this.value.replace(/\D/g,"").slice(0,4);
+    if(d.length===1&&+d>1)d="0"+d;
+    this.value=d.length>2?d.slice(0,2)+" / "+d.slice(2):(d.length===2&&e.inputType!=="deleteContentBackward"?d+" / ":d);
+  });
+  $("ccvc").addEventListener("input",function(){this.value=this.value.replace(/\D/g,"").slice(0,4)});
+
+  /* ---------- validation ---------- */
+  function luhn(n){var s=0,alt=false;for(var i=n.length-1;i>=0;i--){var d=+n[i];if(alt){d*=2;if(d>9)d-=9}s+=d;alt=!alt}return s%10===0}
+  var rules={
+    email:function(v){return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)},
+    first:function(v){return v.trim().length>0},last:function(v){return v.trim().length>0},
+    street:function(v){return v.trim().length>0},city:function(v){return v.trim().length>0},zip:function(v){return v.trim().length>0},
+    country:function(v){return !!v},
+    cname:function(v){return v.trim().length>0},
+    cnum:function(v){var d=v.replace(/\s/g,"");return d.length>=13&&d.length<=19&&luhn(d)},
+    cexp:function(v){var m=/^(\d\d)\s*\/\s*(\d\d)$/.exec(v);if(!m)return false;var mo=+m[1],y=2000+ +m[2];if(mo<1||mo>12)return false;var now=new Date(),cy=now.getFullYear(),cm=now.getMonth()+1;return y>cy||(y===cy&&mo>=cm)},
+    ccvc:function(v){return /^\d{3,4}$/.test(v)},
+    vat:function(){var s=vatState();return s.empty||s.ok}
+  };
+  var fieldEl=function(k){return document.querySelector('[data-f="'+k+'"]')};
+  function check(k){
+    var inp=$(k==="vat"?"vat":k),ok=rules[k](inp.value);
+    fieldEl(k).classList.toggle("bad",!ok);return ok;
+  }
+  Object.keys(rules).forEach(function(k){
+    var inp=$(k);
+    inp.addEventListener("blur",function(){if(inp.value||k==="country")check(k)});
+    inp.addEventListener("input",function(){if(fieldEl(k).classList.contains("bad"))check(k)});
+  });
+  sel.addEventListener("change",function(){check("country")});
+  $("agree").addEventListener("change",function(){$("agree-l").classList.remove("bad");$("err").textContent=""});
+
+  /* ---------- submit ---------- */
+  $("co").addEventListener("submit",function(e){
+    e.preventDefault();
+    var first=null;
+    Object.keys(rules).forEach(function(k){if(!check(k)&&!first)first=$(k)});
+    if(first){$("err").textContent="Please check the highlighted fields.";first.focus();return}
+    if(!$("agree").checked){$("agree-l").classList.add("bad");$("err").textContent="Please accept the End user license agreement to continue.";$("agree").focus();return}
+    $("err").textContent="";
+    var t=calc(),f=function(k){return $(k).value.trim()};
+    /* Card data is deliberately NOT part of this object: it belongs to the payment provider's fields. */
+    var order={license:key,currency:"EUR",subtotal:t.base,vatRate:t.rate,vat:t.vat,total:t.total,vatReverseCharge:t.reverse,
+      email:f("email"),billing:{first:f("first"),last:f("last"),company:f("company"),street:f("street"),city:f("city"),zip:f("zip"),country:sel.value,vatNumber:vatState().empty?"":vatState().value}};
+    var ev=new CustomEvent("guapisima:pay",{detail:order,cancelable:true});
+    var handled=!document.dispatchEvent(ev);   // a payment integration calls preventDefault() and takes over
+    try{sessionStorage.setItem("guapisima.order",JSON.stringify({id:"G-"+(10000+Math.floor(Math.random()*90000)),license:key,vatRate:t.rate,reverse:t.reverse,outside:t.outside}))}catch(e){}
+    if(!handled){$("notice").hidden=false;$("notice").scrollIntoView({block:"nearest",behavior:"smooth"})}
+  });
+})();
+</script>
+</body>
+</html>

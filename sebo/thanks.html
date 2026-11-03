@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Thank you · Guapísima</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+@font-face{font-family:"Guapisima";src:url("fonts/Guapisima-Black.woff2") format("woff2");font-display:swap;ascent-override:99.6%;descent-override:20.4%;line-gap-override:20%}
+@font-face{font-family:"Guapisima Strong";src:url("fonts/Guapisima-BlackStrong.woff2") format("woff2");font-display:swap;ascent-override:99.6%;descent-override:20.4%;line-gap-override:20%}
+@font-face{font-family:"Laminor";src:url("fonts/Laminor-Regular.woff2") format("woff2");font-weight:400;font-style:normal;font-display:swap}
+:root{--ink:#272933;--cream:#F2F0EB;--muted:#B1B4C4;--pink:#FFA6C5;--pad:clamp(20px,6vw,36px)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ink);color:var(--cream);font:400 16px/1.45 "Laminor",sans-serif;font-variant-numeric:lining-nums;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:calc(740px + 2*var(--pad));margin:0 auto;padding:59.5px var(--pad) 64px}
+.num{font-variant-numeric:lining-nums}
+h1,h2,p{margin:0}
+
+/* hero */
+h1{font:400 102px/1 "Guapisima",serif;color:var(--cream);font-feature-settings:"liga","dlig"}
+.lede{margin-top:18.5px;max-width:13em;font:400 50px/1.04 "Guapisima Strong",serif;color:var(--muted)}
+
+/* confirmation */
+.ok{display:flex;align-items:center;gap:12px;margin-top:60px}
+.tick{flex:none;width:32px;height:32px;border-radius:50%;background:var(--pink);color:var(--ink);display:grid;place-items:center}
+.tick svg{width:16px;height:16px}
+.ok h2{font:400 24px/1.2 "Laminor",sans-serif;color:var(--cream)}
+.msg{margin-top:18px;font-size:18px;line-height:1.45;color:var(--muted)}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:25.5px;height:51px;padding-top:5px;border-top:1px solid var(--muted);border-bottom:1px solid var(--muted);font-size:16px;line-height:1;color:var(--muted);font-variant-numeric:lining-nums}
+.meta b{font-weight:400;margin-left:10px}
+.meta .paid{color:var(--cream)}
+.dl{display:flex;align-items:center;justify-content:center;gap:16px;height:68px;margin-top:28px;background:var(--pink);color:var(--ink);text-decoration:none;font:400 22px/1 "Laminor",sans-serif;text-transform:uppercase;letter-spacing:.08em;font-variant-numeric:lining-nums}
+.dl svg{width:22px;height:22px;flex:none}
+.dl:hover{background:#FFB8D0}
+.dl:focus-visible,.rcpt:focus-visible{outline:2px solid var(--cream);outline-offset:3px}
+.dlnote{margin-top:16px;text-align:center;font-size:14px;line-height:1.3;color:var(--muted)}
+
+/* order summary */
+.order{margin-top:39px}
+.order h2{font:400 24px/1.2 "Laminor",sans-serif;color:var(--cream);padding-bottom:13px}
+.order .rows{border-top:1px solid var(--muted)}
+.row{display:flex;justify-content:space-between;gap:24px;align-items:flex-start;color:var(--muted);border-bottom:1px solid var(--muted)}
+.row .name,.row .amt{font-size:24px;line-height:1.2}
+.row .amt{font-variant-numeric:lining-nums;white-space:nowrap}
+.row.main{padding:16px 0 9px}
+.row.main>div:first-child{flex:1;min-width:0}
+.row.main .desc{margin-top:11px;max-width:470px;font-size:16.7px;line-height:1.38}
+.row.main .desc span{display:block}
+.row.extra{padding:16px 0 13px;align-items:center}
+.sums{padding-top:13px;text-align:right;color:var(--muted);font-size:16px;line-height:1.47;font-variant-numeric:lining-nums}
+.total{display:flex;justify-content:space-between;align-items:center;margin-top:19px;font:400 33px/1 "Laminor",sans-serif;font-variant-numeric:lining-nums;color:var(--cream)}
+.rcpt{display:flex;align-items:center;justify-content:center;width:100%;height:55px;margin-top:19px;border:1px solid var(--muted);background:none;color:var(--cream);font:400 16px/1 "Laminor",sans-serif;text-decoration:none;cursor:pointer;border-radius:0;-webkit-appearance:none;appearance:none}
+.rcpt:hover{background:rgba(242,240,235,.06)}
+
+/* next steps */
+.next{margin-top:36px;padding-top:17.5px;border-top:1px solid var(--muted)}
+.next h2{font:400 24px/1.2 "Laminor",sans-serif;color:var(--cream)}
+.step{display:grid;grid-template-columns:38px 1fr;margin-top:20px}
+.step svg{width:20px;height:20px;margin-top:-1px;color:var(--muted)}
+.step h3{margin:0;padding-top:2px;font:400 18px/1.4 "Laminor",sans-serif;color:var(--cream)}
+.step p{margin-top:8px;font-size:16px;line-height:1.45;color:var(--muted)}
+.step+.step{margin-top:24px}
+.step+.step p{margin-top:5px}
+.cont{display:block;width:max-content;margin:36px auto 0;color:var(--cream);font-size:16px;text-underline-offset:.2em}
+.help{margin-top:21px;padding-top:22px;border-top:1px solid var(--muted);text-align:center;color:var(--muted);font-size:16px;line-height:1.8}
+.help a{color:var(--muted)}
+@media (hover:hover){.help a:hover,.cont:hover{color:var(--cream)}}
+
+/* phone and tablet */
+@media (max-width:720px){
+  .wrap{padding-top:36px;padding-bottom:40px}
+  h1{font-size:min(72px,12.29vw)}
+  .lede{margin-top:17.5px;font-size:min(36px,6.15vw)}
+  .ok{margin-top:47px}
+  .meta{margin-top:26px}
+  .row{gap:16px}
+  .row.main .desc{max-width:none}
+}
+@media (max-width:420px){
+  .row .name,.row .amt{font-size:22px}
+}
+@media print{
+  body{background:#fff;color:#111}
+  .dl,.rcpt,.next,.cont{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Thank you,<br>darling!</h1>
+  <p class="lede">Now go make something beautiful, and do send us a peek when you do.</p>
+
+  <div class="ok">
+    <span class="tick" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.4l3 3 6-6.6"/></svg></span>
+    <h2>Your order is confirmed.</h2>
+  </div>
+  <p class="msg">Your payment was successful. Your fonts are ready to download, and a confirmation email with your receipt is on its way.</p>
+
+  <div class="meta"><span>Order<b id="t-id">G-10284</b></span><span class="paid">Paid · <span id="t-paid">108,9€</span></span></div>
+
+  <!-- The payment integration sets this link to the signed download URL (or listens for "guapisima:download"). -->
+  <a class="dl" id="dl" href="#"><svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3.5v10M6.8 9.6l4.2 4.2 4.2-4.2M3.5 14v3.2a1.8 1.8 0 0 0 1.8 1.8h11.4a1.8 1.8 0 0 0 1.8-1.8V14"/></svg>Download your fonts</a>
+  <p class="dlnote">Your download link is also included in your email.</p>
+
+  <section class="order" aria-labelledby="h-order">
+    <h2 id="h-order">Your order</h2>
+    <div class="rows">
+      <div class="row main">
+        <div>
+          <div class="name">Guapísima Pro Black</div>
+          <div class="desc"><span id="t-lic">Small license, up to 3 users, up to 50k visitors/month</span><span>Print, logo and website use for your own business, on one domain</span></div>
+        </div>
+        <div class="amt" id="t-price">90€</div>
+      </div>
+      <div class="row extra"><div class="name">Guapísima Pro Black Strong</div><div class="amt">included</div></div>
+    </div>
+    <div class="sums"><div>Subtotal: <span id="t-sub">90€</span></div><div id="t-vat">vat 21%: 18,9€</div></div>
+    <div class="total"><span>Total paid</span><span id="t-total">108,9€</span></div>
+    <button class="rcpt" type="button" id="rcpt">Download receipt</button>
+  </section>
+
+  <section class="next" aria-labelledby="h-next">
+    <h2 id="h-next">Next steps</h2>
+    <div class="step">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.2V16a1.5 1.5 0 0 0 1.5 1.5h14A1.5 1.5 0 0 0 19.5 16V8.2A1.5 1.5 0 0 0 18 6.7h-7L9.3 4.5H4A1.5 1.5 0 0 0 2.5 6z"/><path d="M11 9.6v5M8.8 12.8l2.2 2.2 2.2-2.2"/></svg>
+      <div><h3>Install your fonts</h3><p>Unzip your download, open the font files and install them on your computer.</p></div>
+    </div>
+    <div class="step">
+      <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.5 2.5H6A1.5 1.5 0 0 0 4.5 4v14A1.5 1.5 0 0 0 6 19.5h4.5M13.5 2.5l4 4v3.5M13.5 2.5v3a1 1 0 0 0 1 1h3"/><path d="M12.6 16.8l2 2 3.6-3.8"/></svg>
+      <div><h3>Keep your license handy</h3><p>Save your receipt and license for your records. You’re ready to start creating.</p></div>
+    </div>
+    <a class="cont" href="index.html">Continue browsing</a>
+  </section>
+
+  <div class="help">Questions about your order or license?<br><a href="mailto:license@guapisima.eu">license@guapisima.eu</a></div>
+</main>
+
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  function money(n){var s=(Math.round(n*100)/100).toFixed(2).replace(/\.?0+$/,"");return s.replace(".",",")+"€"}
+  var LIC={
+    small :{price:90 ,label:"Small license, up to 3 users, up to 50k visitors/month"},
+    medium:{price:180,label:"Medium license, up to 10 users, up to 250k visitors/month"},
+    large :{price:360,label:"Large license, up to 30 users, up to 1M visitors/month"}
+  };
+  /* The order comes from the checkout page (sessionStorage), or from the query string
+     (?order=G-10284&license=small&vat=21) when a payment provider redirects here.
+     With neither, the sample order from the design is shown. */
+  var o={};
+  try{o=JSON.parse(sessionStorage.getItem("guapisima.order")||"{}")||{}}catch(e){}
+  var q=new URLSearchParams(location.search);
+  if(q.get("license"))o.license=q.get("license");
+  if(q.get("order"))o.id=q.get("order");
+  if(q.get("vat")!==null&&q.get("vat")!=="")o.vatRate=parseFloat(q.get("vat"));
+  var lic=LIC[o.license]||LIC.small;
+  var sub=lic.price;
+  var rate=typeof o.vatRate==="number"&&!isNaN(o.vatRate)?o.vatRate:21;
+  if(o.reverse||o.outside)rate=0;
+  var vat=Math.round(sub*rate)/100,total=sub+vat;
+  var vtxt=o.reverse?"vat reverse charge: 0€":(o.outside?"vat: 0€":"vat "+String(rate).replace(".",",")+"%: "+money(vat));
+  $("t-id").textContent=o.id||"G-10284";
+  $("t-lic").textContent=lic.label;
+  $("t-price").textContent=money(sub);
+  $("t-sub").textContent=money(sub);
+  $("t-vat").textContent=vtxt;
+  $("t-total").textContent=money(total);
+  $("t-paid").textContent=money(total);
+
+  /* Integration hooks (cancelable): preventDefault() to take over. */
+  $("dl").addEventListener("click",function(e){
+    var ev=new CustomEvent("guapisima:download",{detail:{order:o.id||"G-10284"},cancelable:true});
+    if(!document.dispatchEvent(ev)||$("dl").getAttribute("href")==="#")e.preventDefault();
+  });
+  $("rcpt").addEventListener("click",function(){
+    var ev=new CustomEvent("guapisima:receipt",{detail:{order:o.id||"G-10284"},cancelable:true});
+    if(document.dispatchEvent(ev))window.print();   // fallback: print / save as PDF
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guapisima Black · glyphsplit</title>
+<style>
+/*
+  Put these two files next to this page:
+    Guapisima-Black-metrics.js            spacing, kerning, features (no outlines)
+    Guapisima-Black-glyphs.woff2 or .ttf  outlines (scrambled spacing and codes)
+  Both are made with: npx glyphsplit Guapisima-Black.ttf --woff2
+*/
+@font-face {
+  font-family: "Guapisima Glyphs";
+  src: url("Guapisima-Black-glyphs.woff2") format("woff2"),
+       url("Guapisima-Black-glyphs.ttf") format("truetype");
+  font-display: block;
+}
+
+/* Layout: a type specimen sheet. Controls on top, then samples by feature. */
+:root {
+  --bg: #F0F1F3; --sheet: #FFFFFF; --ink: #15171C; --muted: #626875; --line: #DADDE2;
+  --accent: #0E6E62; --ok: #1B7F4B; --warn: #B4231B;
+  --cmp-a: #1F6BFF; --cmp-b: #FF2D2D; --cmp-blend: multiply;
+  --ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --fallback: Georgia, "Times New Roman", serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0F1114; --sheet: #171A1F; --ink: #ECEEF1; --muted: #9AA1AD; --line: #2A2E36;
+  --accent: #4FC7B6; --ok: #5FD08F; --warn: #FF7A70;
+  --cmp-a: #00C2FF; --cmp-b: #FF3B30; --cmp-blend: screen; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0F1114; --sheet: #171A1F; --ink: #ECEEF1; --muted: #9AA1AD; --line: #2A2E36;
+  --accent: #4FC7B6; --ok: #5FD08F; --warn: #FF7A70;
+  --cmp-a: #00C2FF; --cmp-b: #FF3B30; --cmp-blend: screen; color-scheme: dark }
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--ui); }
+.wrap { max-width: 1040px; margin: 0 auto; padding-block: 32px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 20px; }
+.type { font-family: var(--fallback); font-weight: 700; }
+.eyebrow { font: 500 12px/1 var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+h1.type { font-size: clamp(48px, 10vw, 120px); line-height: 1; margin: 0; }
+.meta { margin: 14px 0 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
+.meta code { font: 13px var(--mono); }
+
+.controls { display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center;
+  background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; font-size: 14px; }
+.status { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
+.status::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+.status.ok { color: var(--ok); } .status.ok::before { background: var(--ok); }
+.status.warn { color: var(--warn); } .status.warn::before { background: var(--warn); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 7px; overflow: hidden; }
+.seg label { padding: 5px 10px; cursor: pointer; border-left: 1px solid var(--line); }
+.seg label:first-child { border-left: 0; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label:has(input:checked) { background: var(--accent); color: var(--sheet); }
+.seg label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: -2px; }
+.file { position: relative; }
+.file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.btn { display: inline-block; border: 1px solid var(--line); border-radius: 7px; padding: 5px 10px; background: var(--bg); }
+.file:focus-within .btn { outline: 2px solid var(--accent); outline-offset: 2px; }
+.legend { flex-basis: 100%; color: var(--muted); font-size: 13px; margin: 0; }
+.legend b { font-weight: 500; color: var(--ink); }
+.swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: -1px; margin: 0 3px 0 6px; }
+
+.sheet { background: var(--sheet); border: 1px solid var(--line); border-radius: 10px; padding: 22px 22px 26px; }
+.sheet p { margin: 0; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px 28px; }
+.label { font: 12px var(--mono); color: var(--muted); margin-bottom: 4px !important; }
+.big { font-size: clamp(40px, 7vw, 80px); line-height: 1.1; }
+.mid { font-size: clamp(30px, 4.6vw, 48px); line-height: 1.15; }
+.sc { font-variant-caps: small-caps; }
+.onum { font-variant-numeric: oldstyle-nums; }
+.noliga { font-variant-ligatures: none; }
+.row { display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: baseline; padding: 6px 0; border-top: 1px solid var(--line); }
+.row:first-of-type { border-top: 0; }
+.size { font: 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+.text { font-size: 20px; line-height: 1.5; max-width: 36em; display: grid; gap: 14px; }
+.text .just { text-align: justify; }
+.text a { color: var(--accent); }
+.text mark { background: #FFE15A; color: inherit; }
+.text .ul { text-decoration: underline; text-decoration-color: var(--warn); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.text code { font: .8em var(--mono); background: var(--bg); padding: 0 .2em; }
+.alone { font-family: "Guapisima Glyphs", var(--fallback); font-size: 40px; line-height: 1.3; overflow-wrap: anywhere; min-height: 1.3em; }
+.note { color: var(--muted); font-size: 13px; margin-top: 12px !important; max-width: 70ch; }
+
+/* View modes */
+.view-metrics .gsp-svg { visibility: hidden; }
+.compare .gsp-ref { display: block; }
+.gsp-ref { display: none; position: absolute; inset: 0; margin: 0; pointer-events: none; mix-blend-mode: var(--cmp-blend); z-index: 3; }
+.gsp-ref, .gsp-ref * { color: var(--cmp-b) !important; background: none !important; text-decoration: none !important; }
+.compare .gsp-svg text { fill: var(--cmp-a) !important; }
+.compare .gsp-svg { z-index: 2; }
+.compare .gsp-on { isolation: isolate; }
+@media (max-width: 560px) { .row { grid-template-columns: 1fr; gap: 2px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">glyphsplit prototype</p>
+    <h1 class="type" data-glyphsplit>Guapisima Black</h1>
+    <p class="meta">Abstände, Kerning und OpenType-Features kommen aus <code>Guapisima-Black-metrics.js</code>, die Umrisse aus <code>Guapisima-Black-glyphs</code>. Keine der beiden Dateien zeigt allein brauchbare Schrift.</p>
+  </header>
+
+  <section class="controls" aria-label="Steuerung">
+    <span class="status" id="status" role="status">Lade Fonts…</span>
+    <span class="seg" role="radiogroup" aria-label="Ansicht">
+      <label><input type="radio" name="view" value="both" checked> Zusammen</label>
+      <label><input type="radio" name="view" value="metrics"> Nur Maßfont</label>
+    </span>
+    <span class="file">
+      <span class="btn" id="cmpBtn">Mit Original vergleichen…</span>
+      <input type="file" id="cmp" accept=".ttf,.otf,.woff,.woff2" aria-labelledby="cmpBtn">
+    </span>
+    <p class="legend" id="legend">„Nur Maßfont“ blendet die Umrisse aus: Der Text ist dann unsichtbar, aber markierbar. Zum Prüfen lädst du die unveränderte Originaldatei, sie wird darübergelegt.</p>
+  </section>
+
+  <section class="sheet">
+    <p class="eyebrow">Formfont allein, mit eigenen Abständen</p>
+    <p class="alone" id="alone" aria-label="Glyphen des Formfonts ohne Maßfont"></p>
+    <p class="note">So sieht „Hamburgefonstiv“ aus, wenn jemand nur den Formfont benutzt: gespiegelt, jede Glyphe um einen eigenen Betrag verschoben, mit falschen Abständen, und die Zeichen liegen auf zufälligen Codes im privaten Unicode-Bereich.</p>
+  </section>
+
+  <section class="sheet">
+    <p class="eyebrow">Display</p>
+    <p class="type big" data-glyphsplit>Hamburgefonstiv</p>
+  </section>
+
+  <section class="sheet grid2">
+    <div>
+      <p class="label">Kerning</p>
+      <p class="type mid" data-glyphsplit>To Wa Vo AVATAR</p>
+    </div>
+    <div>
+      <p class="label">Kerning aus (font-kerning: none)</p>
+      <p class="type mid" data-glyphsplit style="font-kerning:none">To Wa Vo AVATAR</p>
+    </div>
+    <div>
+      <p class="label">Ligaturen (lang="en")</p>
+      <p class="type mid" lang="en" data-glyphsplit>office fifty fluffig</p>
+    </div>
+    <div>
+      <p class="label">Gleicher Text, lang="de"</p>
+      <p class="type mid" data-glyphsplit>office fifty fluffig</p>
+    </div>
+    <div>
+      <p class="label">Kapitälchen (font-variant-caps)</p>
+      <p class="type mid sc" data-glyphsplit>Kapitälchen</p>
+    </div>
+    <div>
+      <p class="label">Mediävalziffern (oldstyle-nums)</p>
+      <p class="type mid onum" data-glyphsplit>1. 11. 2026</p>
+    </div>
+  </section>
+
+  <section class="sheet">
+    <p class="eyebrow">Größen</p>
+    <div class="row"><span class="size">12 px</span><p class="type" data-glyphsplit style="font-size:12px">Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.</p></div>
+    <div class="row"><span class="size">16 px</span><p class="type" data-glyphsplit style="font-size:16px">Victor jagt zwölf Boxkämpfer quer über den großen Sylter Deich.</p></div>
+    <div class="row"><span class="size">24 px</span><p class="type" data-glyphsplit style="font-size:24px">Victor jagt zwölf Boxkämpfer quer über den Deich.</p></div>
+    <div class="row"><span class="size">40 px</span><p class="type" data-glyphsplit style="font-size:40px">Zwölf Boxkämpfer am Deich.</p></div>
+  </section>
+
+  <section class="sheet">
+    <p class="eyebrow">Fließtext</p>
+    <div class="type text">
+      <p data-glyphsplit class="just">Schrift ist Stimme. Dieser Absatz steht im Blocksatz, mit <a href="https://github.com/">einem Link</a>, einem <mark>markierten Wort</mark>, einer <span class="ul">Unterstreichung</span>, <small>kleinerer Schrift</small>, H<sub>2</sub>O, x<sup>2</sup> und <code>code()</code> in einer anderen Schrift. Markiere den Text: Die Markierung sitzt genau unter den Buchstaben.</p>
+      <p data-glyphsplit>Zeichen, die der Font nicht hat, zeichnet der Browser mit einer Ersatzschrift an der richtigen Stelle: 漢字 ✓ →</p>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/*__GLYPHSPLIT_BUNDLE__*/
+</script>
+<script src="Guapisima-Black-metrics.js"></script>
+<script>
+(function () {
+  var NAME = "Guapisima-Black";          // name used by glyphsplit (file names and GLYPHSPLIT[NAME])
+  var GLYPH_FAMILY = "Guapisima Glyphs"; // font-family of the glyph font (@font-face above)
+
+  var $ = function (id) { return document.getElementById(id); };
+  function fail(msg) { $("status").className = "status warn"; $("status").textContent = msg; }
+
+  var data = window.GLYPHSPLIT && window.GLYPHSPLIT[NAME];
+  if (!data) {
+    fail("Maßfont fehlt: Lege " + NAME + "-metrics.js neben diese Seite.");
+    return;
+  }
+  Glyphsplit.apply({ data: data, glyphFamily: GLYPH_FAMILY }).then(function (n) {
+    $("status").className = "status ok";
+    $("status").textContent = "Beide Fonts geladen · " + n + " Textblöcke";
+    $("alone").textContent = Glyphsplit.glyphCodes("Hamburgefonstiv");
+    document.body.dataset.ready = "1";
+  }, function () {
+    fail("Formfont fehlt: Lege " + NAME + "-glyphs.woff2 oder .ttf neben diese Seite.");
+  });
+
+  document.querySelectorAll('input[name="view"]').forEach(function (r) {
+    r.addEventListener("change", function () { document.body.classList.toggle("view-metrics", r.value === "metrics" && r.checked); });
+  });
+
+  // Overlay of the unchanged original, drawn in the original font at the true position.
+  function buildRef(el) {
+    if (el.querySelector(".gsp-ref")) return;
+    var ref = document.createElement("div");
+    ref.className = "gsp-ref";
+    ref.setAttribute("aria-hidden", "true");
+    Array.prototype.forEach.call(el.childNodes, function (n) {
+      if (n.nodeType === 1 && n.classList.contains("gsp-svg")) return;
+      ref.appendChild(n.cloneNode(true));
+    });
+    var cs = getComputedStyle(el);
+    ["Top", "Right", "Bottom", "Left"].forEach(function (s) { ref.style["padding" + s] = cs["padding" + s]; });
+    ref.style.fontFamily = '"GuapisimaOriginal", ' + getComputedStyle(document.documentElement).getPropertyValue("--fallback");
+    el.appendChild(ref);
+  }
+
+  $("cmp").addEventListener("change", function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      new FontFace("GuapisimaOriginal", reader.result).load().then(function (face) {
+        document.fonts.add(face);
+        document.querySelectorAll(".gsp-on").forEach(buildRef);
+        document.body.classList.add("compare");
+        $("cmpBtn").textContent = "Vergleich mit " + file.name;
+        $("legend").innerHTML = 'glyphsplit<span class="swatch" style="background:var(--cmp-a)"></span> Original<span class="swatch" style="background:var(--cmp-b)"></span>. ' +
+          '<b>Wo beide übereinstimmen, verschmelzen die Farben zu einer Form.</b> Farbige Ränder zeigen eine Abweichung.';
+      }, function () { $("cmpBtn").textContent = file.name + " ist kein lesbarer Font."; });
+    };
+    reader.readAsArrayBuffer(file);
+  });
+})();
+</script>
+</body>
+</html>
