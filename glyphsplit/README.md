@@ -16,7 +16,7 @@ Split a TrueType font into two files that are useless on their own, and put them
 | ID in the PostScript name | `--id kunde42` gives `FontName-kunde42`. PDFs list the PostScript names of embedded fonts, so the ID shows up in every PDF made with the font. |
 | Neutral names | `--uuid` replaces family and PostScript names with a random UUID (which then is the ID). |
 | Fingerprint glyphs | Exact copies of a few letters, named after the copyright text in Adobe Glyph List form (`copyright_space_two_zero_two_six_...`). A contextual substitution puts them in place of the letter wherever neither neighbour is kerned with it, so spacing stays exactly the same. Text extraction that reads glyph names returns the copyright text. Whether a PDF shows it depends on the program that made the PDF. |
-| Mirror and individual offsets | No single step restores the outlines; each glyph needs its own correction. `--no-mirror`, `--no-jitter`, `--jitter-em <n>` |
+| Mirror and individual offsets | No single step restores the outlines; each glyph needs its own correction. `--no-mirror`, `--no-jitter`, `--jitter-em <n>` (default 0.5, capped at 0.5) |
 | Composite glyphs | Kept as composites (e.g. ä = a + dieresis), with each component placement recalculated, so their hinting stays. `--resolve-composites` turns them into plain outlines, so the editor does not show their parts; their hinting is then dropped. |
 
 ## What stays intact
@@ -40,10 +40,15 @@ npx glyphsplit Brand.ttf --woff2 --copyright "© 2026 Your Name" --license "Web 
 
 Writes `Brand-metrics.js` and `Brand-glyphs.woff2`. The metrics font is a script (base64), so pages also work when opened from disk (`file://`).
 
+The input may be a TTF or a WOFF2 file (WOFF2 is decompressed first, which needs the optional `wawoff2` package).
+
 ## Use it
 
 ```html
 <style>
+  /* One @font-face per split font. The metrics families ("Brand Metrics") are registered by
+     the generated scripts, so they cannot be declared here: the text block names them, or
+     gets them prepended when it names none (see below). */
   @font-face { font-family: "Brand Glyphs"; src: url("Brand-glyphs.woff2") format("woff2"); font-display: block; }
 </style>
 
@@ -54,6 +59,20 @@ Writes `Brand-metrics.js` and `Brand-glyphs.woff2`. The metrics font is a script
 <script>
   Glyphsplit.apply({ data: GLYPHSPLIT["Brand"], glyphFamily: "Brand Glyphs" });
 </script>
+```
+
+Several fonts, for example two optical sizes, are passed as an array. Each text block is drawn by the font whose metrics family is named first in its `font-family`; a block that names none gets the first font in the list.
+
+```css
+.tt-text { font-family: "Brand Metrics", serif }
+.tt-text.strong { font-family: "BrandStrong Metrics", serif }
+```
+
+```js
+Glyphsplit.apply([
+  { data: GLYPHSPLIT["Brand"],       glyphFamily: "Brand Glyphs" },
+  { data: GLYPHSPLIT["BrandStrong"], glyphFamily: "BrandStrong Glyphs" }
+]);
 ```
 
 Build the bundle with `npm run bundle`. `npm run demo` builds `demo/glyphsplit-demo.html`, which expects `Guapisima-Black-metrics.js` and `Guapisima-Black-glyphs.woff2` (or `.ttf`) next to it.

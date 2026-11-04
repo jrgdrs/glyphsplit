@@ -5,9 +5,9 @@ const fs = require('fs');
 const path = require('path');
 const { splitFont, toWoff2 } = require('../src');
 
-const HELP = `Usage: glyphsplit <font.ttf> [options]
+const HELP = `Usage: glyphsplit <font.ttf|font.woff2> [options]
 
-Splits a TrueType font into two files that are useless on their own:
+Splits a TrueType font (TTF or WOFF2) into two files that are useless on their own:
   <name>-metrics.js    spacing, kerning and OpenType features, no outlines
                        (a script, so pages also work from file://)
   <name>-glyphs.ttf    outlines and hinting, mirrored at the centre of the colon, each glyph
@@ -24,7 +24,7 @@ Protection:
   --no-fingerprint     No fingerprint glyphs
   --no-mirror          Do not mirror the outlines
   --no-jitter          Do not move glyphs by individual distances
-  --jitter-em <n>      Largest individual distance in em (default: 2)
+  --jitter-em <n>      Largest individual distance in em (default: 0.5, capped at 0.5)
   --resolve-composites Turn composite glyphs (e.g. ä = a + dieresis) into plain
                        outlines, so the editor does not show their parts.
                        Their hinting is dropped.

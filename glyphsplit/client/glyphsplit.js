@@ -8,6 +8,17 @@
  *     Glyphsplit.apply({ data: GLYPHSPLIT["Brand"], glyphFamily: "Brand Glyphs" });
  *   </script>
  *
+ * For more than one font, pass them together: fonts whose metrics family the element
+ * already uses are drawn by the matching one, with the font-family order in the CSS
+ * deciding which that is.
+ *
+ *   <script>
+ *     Glyphsplit.apply([
+ *       { data: GLYPHSPLIT["Brand"], glyphFamily: "Brand Glyphs" },
+ *       { data: GLYPHSPLIT["BrandStrong"], glyphFamily: "BrandStrong Glyphs" }
+ *     ]);
+ *   </script>
+ *
  * How it draws:
  *  1. The text block gets the metrics font. Its glyphs have no outlines, so the
  *     text is laid out exactly like the original but stays invisible. Selection,
@@ -128,7 +139,7 @@
   function charCode(cp) { return String.fromCodePoint(cp); }
 
   function render(state) {
-    var el = state.root, svg = state.svg, eng = state.engine, opts = state.opts;
+    var el = state.root, svg = state.svg, opts = state.opts;
     // an innerHTML reset drops the overlay; a contenteditable element has to keep it first
     if (!svg.isConnected) {
       if (el.isContentEditable) el.insertBefore(svg, el.firstChild);
@@ -137,6 +148,26 @@
     while (svg.firstChild) svg.removeChild(svg.firstChild);
     if (!el.clientWidth) { state.upToDate = false; return; } // no layout box (collapsed container)
     state.upToDate = true;
+    // The font family of the text decides which of the registered fonts draws it: the one
+    // whose metrics family comes first in the family list. A block whose text is switched
+    // to another metrics font (a tester with two optical sizes) therefore changes hands
+    // here as soon as the switch re-renders the block.
+    var font = null;
+    var list = fonts.map(function (f) { return f.opts.metricsFamily; });
+    var walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) { return svg.contains(node) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; }
+    });
+    var node;
+    while ((node = walk.nextNode())) {
+      var pcs = getComputedStyle(node.parentElement);
+      if (pcs.visibility === 'hidden' || pcs.display === 'none') continue;
+      var naming = firstFamily(pcs);
+      if (list.indexOf(naming) < 0) continue;
+      font = fonts[list.indexOf(naming)];
+      break;
+    }
+    if (!font) return;
+    var eng = font.engine;
     svg.setAttribute('width', el.clientWidth);
     svg.setAttribute('height', el.clientHeight);
     var origin = svg.getBoundingClientRect();
@@ -162,13 +193,13 @@
     while ((node = walker.nextNode())) {
       var parent = node.parentElement;
       var cs = getComputedStyle(parent);
-      if (firstFamily(cs) !== opts.metricsFamily) continue; // other fonts draw themselves
+      if (firstFamily(cs) !== font.opts.metricsFamily) continue; // other fonts draw themselves
       if (cs.visibility === 'hidden' || cs.display === 'none') continue;
       var size = parseFloat(cs.fontSize);
       var k = size * k0;
       var features = featuresFor(cs);
       var spacing = parseFloat(cs.letterSpacing) || 0;
-      var ascent = ascentPx(el, opts.metricsFamily, size);
+      var ascent = ascentPx(el, font.opts.metricsFamily, size);
       var fill = cs.color;
       var langEl = parent.closest('[lang]');
       var lang = langEl ? langEl.getAttribute('lang') : '';
@@ -223,7 +254,7 @@
         // Mirrored outline point x' = 2*axis - x + offset, so draw it flipped (scale -1)
         // with the origin moved by (2*axis + offset); unmirrored: moved back by offset.
         var grp = document.createElementNS(SVG_NS, 'g');
-        grp.setAttribute('font-family', '"' + opts.glyphFamily + '"');
+        grp.setAttribute('font-family', '"' + font.opts.glyphFamily + '"');
         grp.setAttribute('font-size', size);
         grp.setAttribute('fill', fill);
         var cps = Array.from(chars);
@@ -245,7 +276,7 @@
       var t = document.createElementNS(SVG_NS, 'text');
       t.setAttribute('x', xs.map(round).join(' '));
       t.setAttribute('y', ys.map(round).join(' '));
-      t.setAttribute('font-family', '"' + opts.glyphFamily + '"');
+      t.setAttribute('font-family', '"' + font.opts.glyphFamily + '"');
       t.setAttribute('font-size', size);
       t.setAttribute('fill', fill);
       t.textContent = chars;
@@ -263,6 +294,9 @@
   }
 
   var states = [];
+  // Every font registered through apply(), in the order it was passed: the family lists in
+  // render() and the CSS are read against this.
+  var fonts = [];
   var pending = false;
   function schedule() {
     if (pending) return;
@@ -271,20 +305,29 @@
   }
 
   /**
-   * @param {object} options
-   * @param {object} options.data          GLYPHSPLIT["Name"] from the generated <name>-metrics.js
-   * @param {string} options.glyphFamily   font-family of the glyph font (@font-face in your CSS)
+   * The metrics font is baked into each block's font-family as the first entry, so the
+   * metrics scripts have to be loaded before this runs.
+   *
+   * @param {object|object[]} options          one entry per split font, or a single entry
+   * @param {object} options.data              GLYPHSPLIT["Name"] from the generated <name>-metrics.js
+   * @param {string} options.glyphFamily       font-family of the glyph font (@font-face in your CSS)
    * @param {string} [options.selector='[data-glyphsplit]']
    * @returns {Promise<number>} number of text blocks set up
    */
   function apply(options) {
-    var data = options.data;
-    if (!data || !data.metrics) return Promise.reject(new Error('glyphsplit: options.data is missing. Load <name>-metrics.js first.'));
-    var opts = {
-      glyphFamily: options.glyphFamily,
-      metricsFamily: data.family + ' Metrics',
-      selector: options.selector || '[data-glyphsplit]'
-    };
+    var list = Array.isArray(options) ? options : [options];
+    var setup = list.map(function (options) {
+      var data = options.data;
+      if (!data || !data.metrics) throw new Error('glyphsplit: options.data is missing. Load <name>-metrics.js first.');
+      return {
+        data: data,
+        opts: {
+          glyphFamily: options.glyphFamily,
+          metricsFamily: data.family + ' Metrics',
+          selector: options.selector || '[data-glyphsplit]'
+        }
+      };
+    });
     if (!document.getElementById('glyphsplit-style')) {
       var st = document.createElement('style');
       st.id = 'glyphsplit-style';
@@ -292,18 +335,44 @@
       document.head.appendChild(st);
     }
     var hbReady = root.createHarfBuzz({ wasmBinary: b64ToBytes(root.GLYPHSPLIT_HB_WASM) }).then(function (inst) { return root.hbjs(inst); });
-    var metricsBytes = b64ToBytes(data.metrics);
-    var face = new FontFace(opts.metricsFamily, metricsBytes);
-    document.fonts.add(face);
-    return Promise.all([hbReady, face.load(), document.fonts.load('16px "' + opts.glyphFamily + '"')]).then(function (res) {
-      if (!res[2].length) throw new Error('glyphsplit: glyph font "' + opts.glyphFamily + '" not found.');
-      var engine = new Engine(res[0], data);
+    var jobs = setup.map(function (s) {
+      var face = new FontFace(s.opts.metricsFamily, b64ToBytes(s.data.metrics));
+      document.fonts.add(face);
+      return Promise.all([face.load(), document.fonts.load('16px "' + s.opts.glyphFamily + '"')]).then(function (res) {
+        if (!res[1].length) throw new Error('glyphsplit: glyph font "' + s.opts.glyphFamily + '" not found.');
+        s.face = face;
+      });
+    });
+    return Promise.all([hbReady].concat(jobs)).then(function (res) {
+      var added = setup.map(function (s) {
+        return { engine: new Engine(res[0], s.data), opts: s.opts };
+      });
+      added.forEach(function (f) { fonts.push(f); });
       var ro = typeof ResizeObserver === 'function' ? new ResizeObserver(schedule) : null;
       window.addEventListener('resize', schedule);
-      var els = Array.from(document.querySelectorAll(opts.selector)).filter(function (e) { return !e.classList.contains('gsp-on'); });
+      // A block is set up once, for the first registered font that claims it. Which font
+      // draws it is decided per render from the family list, so a block that is switched
+      // between two metrics fonts later needs no second overlay.
+      var els = [];
+      added.forEach(function (font) {
+        Array.from(document.querySelectorAll(font.opts.selector)).forEach(function (el) {
+          if (els.indexOf(el) < 0) els.push(el);
+        });
+      });
       els.forEach(function (el) {
+        // The metrics fonts exist only as bytes inside the generated <name>-metrics.js, so
+        // the page names them in its CSS and one of them is the first family here. That
+        // first family is what render() reads to pick the matching glyph font, and what the
+        // block is laid out with. A block whose CSS names none of them gets the first
+        // registered one prepended, so it works without any CSS of its own.
         var cs = getComputedStyle(el);
-        el.style.fontFamily = '"' + opts.metricsFamily + '", ' + cs.fontFamily;
+        var first = firstFamily(cs);
+        var font = null;
+        fonts.some(function (f) { if (f.opts.metricsFamily === first) { font = f; return true; } return false; });
+        if (!font) {
+          font = fonts[0];
+          el.style.fontFamily = '"' + font.opts.metricsFamily + '", ' + cs.fontFamily;
+        }
         el.classList.add('gsp-on');
         var svg = document.createElementNS(SVG_NS, 'svg');
         svg.setAttribute('class', 'gsp-svg');
@@ -313,11 +382,11 @@
         // and the drawing does not depend on the order of the element's children.
         if (el.isContentEditable) el.insertBefore(svg, el.firstChild);
         else el.appendChild(svg);
-        var state = { root: el, svg: svg, engine: engine, opts: opts, upToDate: false };
+        var state = { root: el, svg: svg, upToDate: false };
         states.push(state);
-        render(state);
         if (ro) ro.observe(el);
       });
+      states.forEach(render);
       watchHidden();
       // The layout can still settle after this pass (a webfont arriving, different line
       // breaks), which moves the words away from the boxes drawn here. One more pass on the
@@ -361,7 +430,7 @@
   /** For demos: the glyph-font characters for a text, without positions. */
   function glyphCodes(text, features, lang) {
     if (!states.length) return '';
-    var eng = states[0].engine;
+    var eng = fonts[0].engine;
     return eng.shape(text, features || '', lang || document.documentElement.lang).filter(function (g) { return g.g; })
       .map(function (g) { return charCode(eng.codes[g.g]); }).join('');
   }

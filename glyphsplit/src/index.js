@@ -32,6 +32,8 @@ const HINTING_TABLES = ['fpgm', 'prep', 'cvt ', 'hdmx', 'LTSH', 'VDMX'];
 const FS_TYPE = { installable: 0x0000, restricted: 0x0002, preview: 0x0004, editable: 0x0008 };
 const FINGERPRINT_FEATURES = ['calt', 'liga', 'rlig'];
 const FINGERPRINT_CANDIDATES = 'enisratdhulcgmobwfkzpvjyxq';
+/** Hard cap for the sideways offset of a glyph, in em. */
+const MAX_JITTER_EM = 0.5;
 
 function shuffle(list) {
   const a = list.slice();
@@ -165,7 +167,7 @@ function extendDevice(t, n0, n, baseOf) {
  * @param {object} [o]
  * @param {boolean} [o.mirror=true]       mirror glyphs left/right at the centre of the colon
  * @param {boolean} [o.jitter=true]       move every glyph sideways by its own random distance
- * @param {number}  [o.jitterEm=2]        maximum distance in em
+ * @param {number}  [o.jitterEm=0.5]      maximum distance in em, capped at 0.5
  * @param {string}  [o.embedding='restricted']  OS/2 fsType: restricted | preview | editable | installable
  * @param {string}  [o.copyright]         copyright text (name ID 0 and fingerprint)
  * @param {string}  [o.license]           licence text (name ID 13)
@@ -177,13 +179,14 @@ function extendDevice(t, n0, n, baseOf) {
  */
 async function splitFont(input, o = {}) {
   const opts = {
-    mirror: o.mirror !== false, jitter: o.jitter !== false, jitterEm: o.jitterEm || 2,
+    mirror: o.mirror !== false, jitter: o.jitter !== false, jitterEm: Math.min(o.jitterEm || MAX_JITTER_EM, MAX_JITTER_EM),
     embedding: o.embedding || 'restricted', fingerprint: o.fingerprint !== false, uuid: !!o.uuid,
     resolveComposites: !!o.resolveComposites,
   };
   if (!(opts.embedding in FS_TYPE)) throw new Error(`embedding must be one of ${Object.keys(FS_TYPE).join(', ')}`);
   const warnings = [];
-  const { sfntVersion, tables } = readTables(input);
+  const { sfntVersion, tables } = readTables(await toTtf(input));
+  if (sfntVersion === 0x4f54544f) throw new Error('Only fonts with TrueType outlines (glyf table) are supported, not CFF/OpenType (OTTO).');
   if (!tables.glyf || !tables.loca) throw new Error('Only fonts with TrueType outlines (glyf table) are supported.');
   if (tables.fvar) throw new Error('Variable fonts are not supported. Export a static instance first.');
 
@@ -244,7 +247,7 @@ async function splitFont(input, o = {}) {
   }
 
   // ---- per-glyph sideways offsets ----
-  const maxJ = Math.round(opts.jitterEm * upm), minJ = Math.round(0.25 * upm);
+  const maxJ = Math.round(opts.jitterEm * upm), minJ = Math.min(Math.round(0.25 * upm), maxJ);
   const offsets = new Int32Array(numGlyphs);
   if (opts.jitter) {
     for (let g = 0; g < numGlyphs; g++) {
@@ -388,13 +391,23 @@ async function splitFont(input, o = {}) {
   };
 }
 
-/** Convert a TTF buffer to WOFF2 (needs the optional dependency `wawoff2`). */
-async function toWoff2(ttf) {
-  let wawoff2;
-  try { wawoff2 = require('wawoff2'); } catch (e) {
-    throw new Error('WOFF2 output needs the optional package "wawoff2": npm install wawoff2');
+function loadWawoff2() {
+  try { return require('wawoff2'); } catch (e) {
+    throw new Error('WOFF2 input and output need the optional package "wawoff2": npm install wawoff2');
   }
-  return Buffer.from(await wawoff2.compress(ttf));
 }
 
-module.exports = { splitFont, toWoff2 };
+/** Convert a TTF buffer to WOFF2 (needs the optional dependency `wawoff2`). */
+async function toWoff2(ttf) {
+  return Buffer.from(await loadWawoff2().compress(ttf));
+}
+
+/** Accept a TTF or a WOFF2 buffer; WOFF2 is decompressed first. */
+async function toTtf(input) {
+  if (input.length >= 4 && input.toString('latin1', 0, 4) === 'wOF2') {
+    return Buffer.from(await loadWawoff2().decompress(input));
+  }
+  return input;
+}
+
+module.exports = { splitFont, toWoff2, toTtf };

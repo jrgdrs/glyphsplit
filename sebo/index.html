@@ -32,15 +32,20 @@
 <style>
 
 
-/* Guapisima: line 1 = metrics font (injected by Guapisima-Black-metrics.js as "Guapisima Metrics").
-   "Guapisima" is only the hook for the layout colour and font shorthand, it is never downloaded. */
+/* Guapisima: one block per optical size. Line 1 = glyph font (the outlines), from
+   <name>-glyphs.ttf. The metrics font of the same name is injected by <name>-metrics.js
+   as "<name> Metrics" and has to be the first family on the text, so that the block is
+   laid out with its spacing and the right one of the two glyph fonts draws it. */
 @font-face {
-  font-family: "Guapisima Glyphs";
+  font-family: "Guapisima-Black Glyphs";
   src: url("fonts/Guapisima-Black-glyphs.ttf") format("truetype");
   font-display: block;
 }
-
-@font-face{font-family:"Guapisima Strong";src:url("fonts/Guapisima-BlackStrong.woff2") format("woff2");font-display:swap;ascent-override:99.6%;descent-override:20.4%;line-gap-override:20%}
+@font-face {
+  font-family: "Guapisima-BlackStrong Glyphs";
+  src: url("fonts/Guapisima-BlackStrong-glyphs.ttf") format("truetype");
+  font-display: block;
+}
 @font-face{font-family:"Laminor";src:url("fonts/Laminor-Regular.woff2") format("woff2");font-display:swap}
 @font-face{font-family:"FMKT";src:url("fonts/FMKT-Regular.woff2") format("woff2");font-display:swap}
 
@@ -61,7 +66,7 @@ body{margin:0;background:#fff;color:var(--text);font-family:"FMKT",serif;font-sy
 .intro .wrap{padding-top:var(--hero-top);padding-bottom:var(--hero-bottom)}
 .hi{margin:0;font:400 min(259.47px,calc((100vw - 2*var(--pad))/2.852))/1 "Guapisima-Black Metrics",serif;font-feature-settings:"case";white-space:nowrap;color:var(--cream)}
 .intro .tt{padding:0;margin:var(--g-hi-title) auto 0}
-.intro .tt-text{max-width:12.2em;margin-inline:auto;line-height:1;text-wrap:balance}
+.intro .tt-text{max-width:12.2em;margin-inline:auto;line-height:1;text-wrap:normal}
 .by{margin:var(--g-title-by) 0 0}
 .copy{max-width:26em;font:400 var(--copy-size)/var(--copy-lh) "FMKT",serif;color:var(--text);text-wrap:pretty}
 .copy p{margin:0}
@@ -198,11 +203,13 @@ body{margin:0;background:#fff;color:var(--text);font-family:"FMKT",serif;font-sy
 
 /* editable text */
 .tt-text{margin-top:0;outline:0;line-height:1.05;white-space:pre-wrap;overflow-wrap:anywhere;
-  /* the metrics font draws nothing; the real outlines come from the "Guapisima Glyphs" font
-     in the aria-hidden SVG that Glyphsplit adds inside the element */
+  /* the metrics font draws nothing and has no outlines; the real outlines come from the
+     matching "<name> Glyphs" font in the aria-hidden SVG that Glyphsplit adds. Both
+     families stay in the sheet: the [data-font=strong] rule below has to be able to
+     override the base family (a plain rule wins over a style attribute). */
   caret-color:var(--text);text-align:center;font-family:"Guapisima-Black Metrics",serif;
   transform:translateZ(0)} /* own layer: stops Safari leaving stale paint when the size shrinks */
-.tt[data-font=strong] .tt-text{font-family:"Guapisima Strong",serif}
+.tt[data-font=strong] .tt-text{font-family:"Guapisima-BlackStrong Metrics",serif}
 .tt-text:empty::before{content:attr(data-placeholder);opacity:.25}
 
 
@@ -471,7 +478,7 @@ html.buy-lock{overflow:hidden}
         </div>
         <div class="tt-size"><input type="range" aria-label="Font size"><span class="tt-num"></span><button type="button" class="tt-reset">Reset</button></div>
       </div>
-      <div class="tt-text" data-glyphsplit contenteditable="true" spellcheck="false" data-placeholder="Type here">I’m Guapísima, darling: a little scandal in every stroke. Type something. Make it fabulous.</div>
+      <div class="tt-text" data-glyphsplit contenteditable="true" spellcheck="false" data-placeholder="Type here">I’m Guapísima, darling: <br/>a little scandal in every <br/>stroke. Type something. <br/>Make it fabulous.</div>
     </div>
     <h2 class="sr-only">A few words about the typeface</h2>
     <p class="by sc"><span class="only-d">by </span>Sebastian Boroș</p>
@@ -539,7 +546,7 @@ html.buy-lock{overflow:hidden}
       </div>
       <div class="tt-size"><input type="range" aria-label="Font size"><span class="tt-num"></span><button type="button" class="tt-reset">Reset</button></div>
     </div>
-    <div class="tt-text" contenteditable="true" spellcheck="false" data-placeholder="Type here">Guapísima Pro Black Strong</div>
+    <div class="tt-text" data-glyphsplit contenteditable="true" spellcheck="false" data-placeholder="Type here">Guapísima Pro Black Strong</div>
   </div>
   <p class="note">Click on each one to try it out.</p>
   <div class="col">
@@ -838,7 +845,7 @@ html.buy-lock{overflow:hidden}
         </div>
         <div class="tt-size"><input type="range" aria-label="Font size"><span class="tt-num"></span><button type="button" class="tt-reset">Reset</button></div>
       </div>
-      <div class="tt-text" contenteditable="true" spellcheck="false" data-placeholder="Type here">You’re so independent but that’s gonna change real soon. With my other voice I can destroy this room.<br><span class="qk">My Other Voice · 1979 · Sparks</span></div>
+      <div class="tt-text" data-glyphsplit contenteditable="true" spellcheck="false" data-placeholder="Type here">You’re so independent but that’s gonna change real soon. With my other voice I can destroy this room.<br><span class="qk">My Other Voice · 1979 · Sparks</span></div>
     </div>
   <div class="ornrow" data-orn></div>
 </section>
@@ -1852,6 +1859,17 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
  *     Glyphsplit.apply({ data: GLYPHSPLIT["Brand"], glyphFamily: "Brand Glyphs" });
  *   <\/script>
  *
+ * For more than one font, pass them together: fonts whose metrics family the element
+ * already uses are drawn by the matching one, with the font-family order in the CSS
+ * deciding which that is.
+ *
+ *   <script>
+ *     Glyphsplit.apply([
+ *       { data: GLYPHSPLIT["Brand"], glyphFamily: "Brand Glyphs" },
+ *       { data: GLYPHSPLIT["BrandStrong"], glyphFamily: "BrandStrong Glyphs" }
+ *     ]);
+ *   <\/script>
+ *
  * How it draws:
  *  1. The text block gets the metrics font. Its glyphs have no outlines, so the
  *     text is laid out exactly like the original but stays invisible. Selection,
@@ -1972,7 +1990,7 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
   function charCode(cp) { return String.fromCodePoint(cp); }
 
   function render(state) {
-    var el = state.root, svg = state.svg, eng = state.engine, opts = state.opts;
+    var el = state.root, svg = state.svg, opts = state.opts;
     // an innerHTML reset drops the overlay; a contenteditable element has to keep it first
     if (!svg.isConnected) {
       if (el.isContentEditable) el.insertBefore(svg, el.firstChild);
@@ -1981,6 +1999,26 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
     while (svg.firstChild) svg.removeChild(svg.firstChild);
     if (!el.clientWidth) { state.upToDate = false; return; } // no layout box (collapsed container)
     state.upToDate = true;
+    // The font family of the text decides which of the registered fonts draws it: the one
+    // whose metrics family comes first in the family list. A block whose text is switched
+    // to another metrics font (a tester with two optical sizes) therefore changes hands
+    // here as soon as the switch re-renders the block.
+    var font = null;
+    var list = fonts.map(function (f) { return f.opts.metricsFamily; });
+    var walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (node) { return svg.contains(node) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT; }
+    });
+    var node;
+    while ((node = walk.nextNode())) {
+      var pcs = getComputedStyle(node.parentElement);
+      if (pcs.visibility === 'hidden' || pcs.display === 'none') continue;
+      var naming = firstFamily(pcs);
+      if (list.indexOf(naming) < 0) continue;
+      font = fonts[list.indexOf(naming)];
+      break;
+    }
+    if (!font) return;
+    var eng = font.engine;
     svg.setAttribute('width', el.clientWidth);
     svg.setAttribute('height', el.clientHeight);
     var origin = svg.getBoundingClientRect();
@@ -2006,13 +2044,13 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
     while ((node = walker.nextNode())) {
       var parent = node.parentElement;
       var cs = getComputedStyle(parent);
-      if (firstFamily(cs) !== opts.metricsFamily) continue; // other fonts draw themselves
+      if (firstFamily(cs) !== font.opts.metricsFamily) continue; // other fonts draw themselves
       if (cs.visibility === 'hidden' || cs.display === 'none') continue;
       var size = parseFloat(cs.fontSize);
       var k = size * k0;
       var features = featuresFor(cs);
       var spacing = parseFloat(cs.letterSpacing) || 0;
-      var ascent = ascentPx(el, opts.metricsFamily, size);
+      var ascent = ascentPx(el, font.opts.metricsFamily, size);
       var fill = cs.color;
       var langEl = parent.closest('[lang]');
       var lang = langEl ? langEl.getAttribute('lang') : '';
@@ -2067,7 +2105,7 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
         // Mirrored outline point x' = 2*axis - x + offset, so draw it flipped (scale -1)
         // with the origin moved by (2*axis + offset); unmirrored: moved back by offset.
         var grp = document.createElementNS(SVG_NS, 'g');
-        grp.setAttribute('font-family', '"' + opts.glyphFamily + '"');
+        grp.setAttribute('font-family', '"' + font.opts.glyphFamily + '"');
         grp.setAttribute('font-size', size);
         grp.setAttribute('fill', fill);
         var cps = Array.from(chars);
@@ -2089,7 +2127,7 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
       var t = document.createElementNS(SVG_NS, 'text');
       t.setAttribute('x', xs.map(round).join(' '));
       t.setAttribute('y', ys.map(round).join(' '));
-      t.setAttribute('font-family', '"' + opts.glyphFamily + '"');
+      t.setAttribute('font-family', '"' + font.opts.glyphFamily + '"');
       t.setAttribute('font-size', size);
       t.setAttribute('fill', fill);
       t.textContent = chars;
@@ -2107,6 +2145,9 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
   }
 
   var states = [];
+  // Every font registered through apply(), in the order it was passed: the family lists in
+  // render() and the CSS are read against this.
+  var fonts = [];
   var pending = false;
   function schedule() {
     if (pending) return;
@@ -2115,20 +2156,29 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
   }
 
   /**
-   * @param {object} options
-   * @param {object} options.data          GLYPHSPLIT["Name"] from the generated <name>-metrics.js
-   * @param {string} options.glyphFamily   font-family of the glyph font (@font-face in your CSS)
+   * The metrics font is baked into each block's font-family as the first entry, so the
+   * metrics scripts have to be loaded before this runs.
+   *
+   * @param {object|object[]} options          one entry per split font, or a single entry
+   * @param {object} options.data              GLYPHSPLIT["Name"] from the generated <name>-metrics.js
+   * @param {string} options.glyphFamily       font-family of the glyph font (@font-face in your CSS)
    * @param {string} [options.selector='[data-glyphsplit]']
    * @returns {Promise<number>} number of text blocks set up
    */
   function apply(options) {
-    var data = options.data;
-    if (!data || !data.metrics) return Promise.reject(new Error('glyphsplit: options.data is missing. Load <name>-metrics.js first.'));
-    var opts = {
-      glyphFamily: options.glyphFamily,
-      metricsFamily: data.family + ' Metrics',
-      selector: options.selector || '[data-glyphsplit]'
-    };
+    var list = Array.isArray(options) ? options : [options];
+    var setup = list.map(function (options) {
+      var data = options.data;
+      if (!data || !data.metrics) throw new Error('glyphsplit: options.data is missing. Load <name>-metrics.js first.');
+      return {
+        data: data,
+        opts: {
+          glyphFamily: options.glyphFamily,
+          metricsFamily: data.family + ' Metrics',
+          selector: options.selector || '[data-glyphsplit]'
+        }
+      };
+    });
     if (!document.getElementById('glyphsplit-style')) {
       var st = document.createElement('style');
       st.id = 'glyphsplit-style';
@@ -2136,18 +2186,44 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
       document.head.appendChild(st);
     }
     var hbReady = root.createHarfBuzz({ wasmBinary: b64ToBytes(root.GLYPHSPLIT_HB_WASM) }).then(function (inst) { return root.hbjs(inst); });
-    var metricsBytes = b64ToBytes(data.metrics);
-    var face = new FontFace(opts.metricsFamily, metricsBytes);
-    document.fonts.add(face);
-    return Promise.all([hbReady, face.load(), document.fonts.load('16px "' + opts.glyphFamily + '"')]).then(function (res) {
-      if (!res[2].length) throw new Error('glyphsplit: glyph font "' + opts.glyphFamily + '" not found.');
-      var engine = new Engine(res[0], data);
+    var jobs = setup.map(function (s) {
+      var face = new FontFace(s.opts.metricsFamily, b64ToBytes(s.data.metrics));
+      document.fonts.add(face);
+      return Promise.all([face.load(), document.fonts.load('16px "' + s.opts.glyphFamily + '"')]).then(function (res) {
+        if (!res[1].length) throw new Error('glyphsplit: glyph font "' + s.opts.glyphFamily + '" not found.');
+        s.face = face;
+      });
+    });
+    return Promise.all([hbReady].concat(jobs)).then(function (res) {
+      var added = setup.map(function (s) {
+        return { engine: new Engine(res[0], s.data), opts: s.opts };
+      });
+      added.forEach(function (f) { fonts.push(f); });
       var ro = typeof ResizeObserver === 'function' ? new ResizeObserver(schedule) : null;
       window.addEventListener('resize', schedule);
-      var els = Array.from(document.querySelectorAll(opts.selector)).filter(function (e) { return !e.classList.contains('gsp-on'); });
+      // A block is set up once, for the first registered font that claims it. Which font
+      // draws it is decided per render from the family list, so a block that is switched
+      // between two metrics fonts later needs no second overlay.
+      var els = [];
+      added.forEach(function (font) {
+        Array.from(document.querySelectorAll(font.opts.selector)).forEach(function (el) {
+          if (els.indexOf(el) < 0) els.push(el);
+        });
+      });
       els.forEach(function (el) {
+        // The metrics fonts exist only as bytes inside the generated <name>-metrics.js, so
+        // the page names them in its CSS and one of them is the first family here. That
+        // first family is what render() reads to pick the matching glyph font, and what the
+        // block is laid out with. A block whose CSS names none of them gets the first
+        // registered one prepended, so it works without any CSS of its own.
         var cs = getComputedStyle(el);
-        el.style.fontFamily = '"' + opts.metricsFamily + '", ' + cs.fontFamily;
+        var first = firstFamily(cs);
+        var font = null;
+        fonts.some(function (f) { if (f.opts.metricsFamily === first) { font = f; return true; } return false; });
+        if (!font) {
+          font = fonts[0];
+          el.style.fontFamily = '"' + font.opts.metricsFamily + '", ' + cs.fontFamily;
+        }
         el.classList.add('gsp-on');
         var svg = document.createElementNS(SVG_NS, 'svg');
         svg.setAttribute('class', 'gsp-svg');
@@ -2157,11 +2233,11 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
         // and the drawing does not depend on the order of the element's children.
         if (el.isContentEditable) el.insertBefore(svg, el.firstChild);
         else el.appendChild(svg);
-        var state = { root: el, svg: svg, engine: engine, opts: opts, upToDate: false };
+        var state = { root: el, svg: svg, upToDate: false };
         states.push(state);
-        render(state);
         if (ro) ro.observe(el);
       });
+      states.forEach(render);
       watchHidden();
       // The layout can still settle after this pass (a webfont arriving, different line
       // breaks), which moves the words away from the boxes drawn here. One more pass on the
@@ -2205,30 +2281,36 @@ window.GLYPHSPLIT_HB_WASM = "AGFzbQEAAAAB9AIsYAF/AGACf38Bf2ADf39/AX9gAX8Bf2ADf39
   /** For demos: the glyph-font characters for a text, without positions. */
   function glyphCodes(text, features, lang) {
     if (!states.length) return '';
-    var eng = states[0].engine;
+    var eng = fonts[0].engine;
     return eng.shape(text, features || '', lang || document.documentElement.lang).filter(function (g) { return g.g; })
       .map(function (g) { return charCode(eng.codes[g.g]); }).join('');
   }
 
   root.Glyphsplit = { apply: apply, refresh: refresh, glyphCodes: glyphCodes };
 })(typeof window !== 'undefined' ? window : this);
-
 </script>
 <script src="fonts/Guapisima-Black-metrics.js"></script>
+<script src="fonts/Guapisima-BlackStrong-metrics.js"></script>
 <script>
-/* Recombines the split font: the metrics script above carries the spacing, this call
-   paints the outlines from "Guapisima Glyphs" into an SVG overlay per text block. */
+/* Recombines both split fonts: each metrics script above carries the spacing of one optical
+   size, this call paints its outlines from the matching glyph font into an SVG overlay per
+   text block. The text block carries both metrics fonts in its font-family, in the order
+   glyphsplit was given here, and the first one that is present decides which is used. */
 (function () {
-  var NAME = "Guapisima-Black";           // name used by glyphsplit, key in GLYPHSPLIT
-  var GLYPH_FAMILY = "Guapisima Glyphs";  // font-family of the glyph font (@font-face above)
+  var FONTS = [
+    { name: "Guapisima-Black",       glyphFamily: "Guapisima-Black Glyphs" },
+    { name: "Guapisima-BlackStrong", glyphFamily: "Guapisima-BlackStrong Glyphs" }
+  ];
 
-  var data = window.GLYPHSPLIT && window.GLYPHSPLIT[NAME];
-  if (!data || typeof Glyphsplit === "undefined") return;
+  var list = FONTS.map(function (f) {
+    return { data: window.GLYPHSPLIT && window.GLYPHSPLIT[f.name], glyphFamily: f.glyphFamily };
+  });
+  if (typeof Glyphsplit === "undefined" || !list[0].data || !list[1].data) return;
 
-  Glyphsplit.apply({ data: data, glyphFamily: GLYPH_FAMILY });
+  Glyphsplit.apply(list);
 
-  // Supplied fonts (Laminor, FMKT, Guapisima Strong) can measure before their faces are
-  // ready; re-fit the testers and repaint the overlays once everything has loaded.
+  // Supplied fonts can measure before their faces are ready; re-fit the testers and repaint
+  // the overlays once everything has loaded.
   var refit = function () {
     document.querySelectorAll(".tt").forEach(function (tt) {
       if (window.fitFontSize) window.fitFontSize(tt);
